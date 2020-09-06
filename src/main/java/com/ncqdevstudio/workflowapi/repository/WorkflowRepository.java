@@ -3,6 +3,7 @@ package com.ncqdevstudio.workflowapi.repository;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -41,22 +42,30 @@ public class WorkflowRepository {
 		String name = criteria.getName();		
 		
 		if(!StringUtils.isEmpty(name)){
-			workflows.addAll(em.createQuery("select distinct w from workflow w where w.name LIKE '%"+name+"%'").getResultList());
+			workflows.addAll(em.createQuery("select distinct w from Workflow w where w.name LIKE '%"+name+"%'").getResultList());
 		}
           	
 		List<Integer> idCategories = criteria.getIdCategories();
 		
 		if(!CollectionUtils.isEmpty(idCategories)){
-     		String nativeQuery = "select wc from workflows_categories wc where category_id in :categories";
-			Query q = em.createNativeQuery(nativeQuery);
-			q.setParameter("names", idCategories);
-			workflows.addAll(q.getResultList());			
+     		String nativeQuery = "select w.* from workflows_categories wc, workflow w"
+     				+ " where wc.workflow_id = w.id_workflow and wc.category_id in :categories";
+			Query q = em.createNativeQuery(nativeQuery, Workflow.class);
+			q.setParameter("categories", idCategories);
+			workflows = workflows.stream()
+			  .distinct()
+			  .filter(q.getResultList()::contains)
+			  .collect(Collectors.toSet());			
 		}
 		
 		Integer status = criteria.getStatus();
 		
 		if(status != null){
-			workflows.addAll(em.createQuery("select distinct w from workflow w where w.status = "+status).getResultList());
+			Query q = em.createQuery("select distinct w from Workflow w where w.status = "+status);
+			workflows = workflows.stream()
+					  .distinct()
+					  .filter(q.getResultList()::contains)
+					  .collect(Collectors.toSet());
 		}
 		
 		return workflows;
