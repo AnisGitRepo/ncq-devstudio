@@ -28,7 +28,7 @@ import com.ncqdevstudio.workflowapi.service.WorkflowService;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(WorkflowResource.class)
-public class WorkflowResourceIntegrationTest {
+public class WorkflowResourceTest {
 
 	
 	 @Autowired
