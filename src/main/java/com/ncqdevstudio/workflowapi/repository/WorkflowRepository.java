@@ -1,29 +1,24 @@
 package com.ncqdevstudio.workflowapi.repository;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
-import com.ncqdevstudio.workflowapi.dto.WorkflowSearchCriteria;
 import com.ncqdevstudio.workflowapi.entites.Workflow;
 import com.ncqdevstudio.workflowapi.entites.WorkflowCategory;
 
+/**
+ * Repository component for managing workflow
+ * @author ABM
+ *
+ */
 @Repository
 public class WorkflowRepository {
 
-	
-    private Logger logger = LoggerFactory.getLogger(getClass());
 	
 	@Autowired
 	EntityManager em;
@@ -32,7 +27,24 @@ public class WorkflowRepository {
 		return em.createQuery("select c from WorkflowCategory c", WorkflowCategory.class).getResultList();
 	}
 	
-	public Set<Workflow> findWorkflowsByFilter(WorkflowSearchCriteria criteria){
+	public List<Workflow> findAllWorkflowByName(String name){
+		return em.createQuery("select distinct w from Workflow w where LOWER(w.name) LIKE '%"+name.toLowerCase()+"%'", Workflow.class).getResultList();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Workflow> findAllWorkflowByListIdCategories(List<Integer> idCategories){
+		String nativeQuery = "select w.* from workflows_categories wc, workflow w"
+ 				+ " where wc.workflow_id = w.id_workflow and wc.category_id in :categories";
+		Query q = em.createNativeQuery(nativeQuery, Workflow.class);
+		q.setParameter("categories", idCategories);
+		return q.getResultList();
+	}
+	
+	public List<Workflow> findAllWorkflowByStatus(Integer status){
+		return em.createQuery("select distinct w from Workflow w where w.status = "+status, Workflow.class).getResultList();
+	}
+	
+	/*public Set<Workflow> findWorkflowsByFilter(WorkflowSearchCriteria criteria){
 		
 		if(criteria == null){
 			return null;
@@ -42,7 +54,7 @@ public class WorkflowRepository {
 		String name = criteria.getName();		
 		
 		if(!StringUtils.isEmpty(name)){
-			workflows.addAll(em.createQuery("select distinct w from Workflow w where w.name LIKE '%"+name+"%'").getResultList());
+			workflows.addAll(em.createQuery("select distinct w from Workflow w where LOWER(w.name) LIKE '%"+name.toLowerCase()+"%'").getResultList());
 		}
           	
 		List<Integer> idCategories = criteria.getIdCategories();
@@ -69,7 +81,7 @@ public class WorkflowRepository {
 		}
 		
 		return workflows;
-	}
+	}*/
 	
 	 
 }

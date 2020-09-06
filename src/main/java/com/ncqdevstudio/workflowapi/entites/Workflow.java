@@ -1,5 +1,7 @@
 package com.ncqdevstudio.workflowapi.entites;
 
+import io.swagger.annotations.ApiModel;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 
+@ApiModel(description="All details about the workflow. ")
 @Entity
 public class Workflow {
 

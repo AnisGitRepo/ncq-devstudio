@@ -1,5 +1,7 @@
 package com.ncqdevstudio.workflowapi.entites;
 
+import io.swagger.annotations.ApiModel;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +13,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 
+@ApiModel(description="All details about the workflow category. ")
 @Entity
 public class WorkflowCategory {
 
